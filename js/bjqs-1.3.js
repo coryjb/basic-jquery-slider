@@ -17,8 +17,7 @@
 
     "use strict";
 
-    $.fn.bjqs = function(o) {
-        
+    $.fn.bjqs = function(o) {    
         // slider default settings
         var defaults        = {
 
@@ -47,8 +46,9 @@
             // presentational options
             usecaptions     : true,     // enable/disable captions using img title attribute
             randomstart     : false,     // start from a random slide
-            responsive      : false     // enable responsive behaviour
-
+            responsive      : false,     // enable responsive behaviour
+            
+            url             : 'http://omahanightlife.com/tools/featured/xml/home'        // ONL URL
         };
 
         // create settings from defauls and user options
@@ -96,10 +96,77 @@
             fwd             : 'forward',
             prev            : 'previous'
         };
-            
+    
+        // parse ONL XML feed
+        var parseFeed = function() {            
+            $.get(settings.url, function(feed) {
+                /*if (window.DOMParser) {
+                    var parser = new DOMParser();
+                    var xml = parser.parseFromString(feed, 'text/xml');
+                } else {
+                    var xml = new ActiveXObject("Microsoft.XMLDOM");
+                    xml.async = false;
+                    xml.loadXML(feed); 
+                }*/
+                
+                var $feed = $(feed);
+                
+                var ads = [];
+                
+                $feed.find('featured').each(function(k, v) {
+                    var $featured = $(v);
+                    
+                    ads.push({
+                         image  : $featured.attr('image'),
+                         ref    : $featured.attr('ref'),
+                         href   : $featured.attr('href'),
+                         zone   : $featured.attr('zone'),
+                         flash    : $featured.attr('image').indexOf('.swf') !== -1
+                    });
+                });
+                
+                // Build slides
+                var content = [];
+                $(ads).each(function(k, ad) {
+                    var temp = '';
+                    
+                    if (ad.flash) {
+                        temp = '<a href="' + ad.href + '" class="flash-overlay"></a>\
+        				    <object type="application/x-shockwave-flash" data="' + ad.image + '" id="applicationID" style="margin:0; width: 490px; height: 255px;">\
+        					    <param name="movie" value="' + ad.image + '" />\
+        					    <param name="wmode" value="transparent" />\
+        					    <param name="FlashVars" value="" />\
+        					    <param name="quality" value="high" />\
+        					    <param name="menu" value="false" />\
+        				    </object>\
+        				</a>';
+                    } else {
+                        temp = '<a href="' + ad.href + '">\
+        					<img src="' + ad.image + '" ref="' + ad.ref + '" />\
+        				</a>';
+                    }
+                    
+                    temp += '<img src="' + ad.ref + '" class="delivery" />';
+                    
+                    temp = '<li>' + temp + '</li>';
+                    
+                    content.push(temp);
+                });
+                
+                content = content.join("\n\n");
+                
+                // Update settings
+                $slider.html(content);
+                $slides = $slider.children('li');
+                state.slidecount = $slides.length;
+
+                init();
+                
+            }, 'xml');
+        }
+        
         // run through options and initialise settings
         var init = function() {
-
             // differentiate slider li from content li
             $slides.addClass('bjqs-slide');
 
@@ -710,9 +777,13 @@
             }
 
         };
+        
+        // Parse feed
+        parseFeed();
 
-        // lets get the party started :)
-        init();
+        // let's get the party started :)
+        // called in parseFeed()
+        //init();
 
     };
 
