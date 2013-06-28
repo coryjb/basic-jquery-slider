@@ -22,32 +22,7 @@
 	body, html {
 		margin: 50px;
 		padding: 0;
-	}
-
-	a.flash-overlay {
-		display: block;
-		width: 490px;
-		height: 255px;
-		position: absolute;
-	}
-	
-	#slider {
-		width: 490px;
-		height: 275px;
-		overflow: hidden;
-		background: #000;
-	}
-	
-	#slider .bjqs-markers {
-		position: absolute;
-		bottom: 0;
-		height: 15px;
-		border-radius: 100px;
-	}
-
-	.rounded {
-		border-radius: 6px;
-		overflow: hidden;
+		background: #333;
 	}
 	</style>
 </head>
@@ -55,7 +30,7 @@
 <body>
 	<!--  Outer wrapper for presentation only, this can be anything you like -->
 	<div id="slider">
-'
+
 		<!-- start Basic Jquery Slider -->
 		<ul class="bjqs rounded"></ul>
 		<!-- end Basic jQuery Slider -->
@@ -67,12 +42,12 @@
 	jQuery(document).ready(function($) {
 
 		$('#slider').bjqs({
-			height      : 255,
+			height      : 275,
 			width       : 490,
 			responsive  : true,
 			showcontrols: false,
 			showmarkers	: true,
-			automatic	: false,
+			automatic	: true,
 			animspeed	: 6500,
 			url			: 'sample/home.xml'
 		});
